@@ -32,14 +32,15 @@
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
             {% if current_user.is_authenticated %}
-                {% if current_user.status is Mentor %}
+
+                {% if status != ''  %}
                     <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a>
                     <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
-                    <a class="nav-item nav-link" href=/>Mentees</a>
+                    <a class="nav-item nav-link" href=/>{{ status }}</a>
                 {% else %}
                     <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a>
                     <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
-                    <a class="nav-item nav-link" href=/>Mentor</a>
+                    <a class="nav-item nav-link" href=/>{{ status }}</a>
                 {% endif %}
             {% else %}
 
