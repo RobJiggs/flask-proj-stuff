@@ -8,7 +8,14 @@ from flask_login import login_user, current_user, logout_user, login_required
 @app.route("/")
 @app.route("/home")
 def home():
-    return render_template('home.html')
+    if current_user.is_authenticated:
+       status=current_user.status
+
+       return render_template('home.html',status=status)
+
+
+    else:
+        return render_template('home.html')
 
 
 @app.route("/about")
@@ -54,7 +61,8 @@ def registermentor():
         jt1 = jtname.name
 
         user = Usermentor(username=form.username.data, email=form.email.data,
-                          password=hashed_password,field=jf1,job=jt1,status='Mentor')
+                          password=hashed_password,field=jf1,job=jt1,status='Mentor',
+                          experience=form.experience.data)
         db.session.add(user)
         db.session.commit()
         flash('Your account has been created! You are now able to log in', 'success')
@@ -111,3 +119,4 @@ def logout():
 @login_required
 def account():
     return render_template('account.html', title='Account')
+    
