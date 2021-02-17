@@ -1,6 +1,6 @@
 from flask import render_template, url_for, flash, redirect, request, jsonify
 from mentor import app, db, bcrypt
-from mentor.forms import RegistrationForm, LoginForm,RegistrationFormMentor,LoginFormMentor
+from mentor.forms import RegistrationForm, LoginForm,RegistrationFormMentor
 from mentor.models import User, Usermentor,Jobfield,Jobtitle
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -75,29 +75,25 @@ def login():
         return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
-            login_user(user, remember=form.remember.data)
-            next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('home'))
+        if form.stat.data == 'Mentee':
+            user = User.query.filter_by(email=form.email.data).first()
+            if user and bcrypt.check_password_hash(user.password, form.password.data):
+                login_user(user, remember=form.remember.data)
+                next_page = request.args.get('next')
+                return redirect(next_page) if next_page else redirect(url_for('home'))
+            else:
+                flash('Login Unsuccessful. Please check email and password', 'danger')
         else:
-            flash('Login Unsuccessful. Please check email and password', 'danger')
+            user = Usermentor.query.filter_by(email=form.email.data).first()
+            if user and bcrypt.check_password_hash(user.password, form.password.data):
+                login_user(user, remember=form.remember.data)
+                next_page = request.args.get('next')
+                return redirect(next_page) if next_page else redirect(url_for('home'))
+            else:
+                flash('Login Unsuccessful. Please check email and password', 'danger')
     return render_template('login.html', title='Login', form=form)
 
-@app.route("/login-mentor", methods=['GET', 'POST'])
-def loginmentor():
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
-    form = LoginFormMentor()
-    if form.validate_on_submit():
-        user = Usermentor.query.filter_by(email=form.email.data).first()
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
-            login_user(user, remember=form.remember.data)
-            next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('home'))
-        else:
-            flash('Login Unsuccessful. Please check email and password', 'danger')
-    return render_template('loginmentor.html', title='Login', form=form)
+
 
 @app.route("/jobtitle/<jfield>", methods=['GET', 'POST'])
 def jobtitle(jfield):
@@ -119,4 +115,3 @@ def logout():
 @login_required
 def account():
     return render_template('account.html', title='Account')
-    
